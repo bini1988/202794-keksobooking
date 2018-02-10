@@ -1,0 +1,27 @@
+{
+  "name": "202794-keksobooking",
+  "version": "1.0.0",
+  "description": "* Студент: [Николай К](https://up.htmlacademy.ru/nodejs/1/user/202794). * Наставник: `Артем Черкасов`.",
+  "main": "index.js",
+  "scripts": {
+    "test:lint": "eslint .",
+    "test": "npm run test:lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bini1988/202794-keksobooking.git"
+  },
+  "keywords": [
+    "nodejs"
+  ],
+  "author": "Nikolai K",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bini1988/202794-keksobooking/issues"
+  },
+  "homepage": "https://github.com/bini1988/202794-keksobooking#readme",
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-htmlacademy": "^0.4.2"
+  }
+}
