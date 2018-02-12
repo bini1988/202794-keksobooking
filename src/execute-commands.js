@@ -14,9 +14,9 @@ function printCommandUnknown(cmd) {
 
 function executeCommands(args) {
   for (const arg of args) {
-    const cmd = cmds.find((it) => `--${it.name}` === arg)
+    const cmd = cmds.find((it) => `--${it.name}` === arg);
 
-    if (cmd !== undefined) {
+    if (cmd) {
       cmd.execute();
     } else {
       printCommandUnknown(arg);
