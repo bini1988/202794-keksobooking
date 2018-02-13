@@ -1,3 +1,5 @@
+require(`colors`);
+
 module.exports = (commands = []) => ({
   name: `help`,
   description: `печатает этот текст`,
@@ -7,7 +9,10 @@ module.exports = (commands = []) => ({
     console.log(`Доступные команды:`);
 
     for (const {name, description} of commands) {
-      console.log(`${name.padEnd(NAME_FIELD_WIDTH)} - ${description};`);
+      const fieldName = `${name.padEnd(NAME_FIELD_WIDTH)}`.grey;
+      const fieldDescription = `${description}`.green;
+
+      console.log(`--${fieldName} - ${fieldDescription};`);
     }
   }
 });
