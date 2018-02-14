@@ -3,17 +3,10 @@ require(`colors`);
 const APP_VERSION = require(`../../package.json`).version;
 
 function colorizeVersion(version) {
-  return version.split(`.`).map((it, index) => {
-    switch (index) {
-      case 0:
-        return `${it}`.red;
-      case 1:
-        return `${it}`.green;
-      case 2:
-        return `${it}`.blue;
-      default:
-        return `${it}`;
-    }
+  const colors = [`red`, `green`, `blue`];
+
+  return version.split(`.`).map((item, index) => {
+    return (colors[index] && `${item}`[colors[index]]) || `${item}`;
   }).join(`.`);
 }
 
