@@ -1,10 +1,13 @@
-const cmds = [
-  require(`./commands/author`),
-  require(`./commands/description`),
-  require(`./commands/help`),
-  require(`./commands/license`),
-  require(`./commands/version`),
-];
+
+const cmds = [];
+
+cmds.push(
+    require(`./commands/help`)(cmds),
+    require(`./commands/author`),
+    require(`./commands/description`),
+    require(`./commands/license`),
+    require(`./commands/version`)
+);
 
 function printCommandUnknown(cmd) {
   console.error(`Неизвестная команда "${cmd}".`);
