@@ -1,5 +1,7 @@
 const assert = require(`assert`);
-const {generateEntity, options} = require(`../src/generate`);
+const {generateEntity} = require(`../src/generate/generate`);
+const locationFactory = require(`../src/generate/location`);
+const offerFactory = require(`../src/generate/offer`);
 
 function assertObjectProperty(obj, property, message) {
   assert(obj.hasOwnProperty(property), message || `'${property}' property should exist`);
@@ -15,7 +17,7 @@ function assertArrayMember(array, member) {
 
 function assertArray(value, type, message) {
   assert(Array.isArray(value), message || `value should be Array`);
-  assert(value.every((item) => typeof item === `string`), message || `value should be Array<${type}>`);
+  assert(value.every((item) => (typeof item === type)), message || `value should be Array<${type}>`);
 }
 
 function assertInRange(value, min, max) {
@@ -24,7 +26,7 @@ function assertInRange(value, min, max) {
 
 function getEntities() {
   const entities = [];
-  const titlesCount = options.offer.titles.length;
+  const titlesCount = offerFactory.options.titles.length;
 
   for (let index = 0; index < titlesCount; index++) {
     entities.push(generateEntity());
@@ -75,9 +77,9 @@ describe(`generateEntity`, () => {
     it(`should have valid 'title' property`, () => {
       assertObjectProperty(offer, `title`);
       assertType(offer.title, `string`);
-      assertArrayMember(options.offer.titles, offer.title);
+      assertArrayMember(offerFactory.options.titles, offer.title);
 
-      const titlesCount = options.offer.titles.length;
+      const titlesCount = offerFactory.options.titles.length;
       assert((new Set(entities)).size === titlesCount, `values of 'title' should be unique`);
     });
 
@@ -93,21 +95,21 @@ describe(`generateEntity`, () => {
       assertObjectProperty(offer, `price`);
       assertType(offer.price, `number`);
 
-      const {min, max} = options.offer.price;
+      const {min, max} = offerFactory.options.price;
       assertInRange(offer.price, min, max);
     });
 
     it(`should have valid 'type' property`, () => {
       assertObjectProperty(offer, `type`);
       assertType(offer.type, `string`);
-      assertArrayMember(options.offer.types, offer.type);
+      assertArrayMember(offerFactory.options.types, offer.type);
     });
 
     it(`should have valid 'rooms' property`, () => {
       assertObjectProperty(offer, `rooms`);
       assertType(offer.rooms, `number`);
 
-      const {min, max} = options.offer.rooms;
+      const {min, max} = offerFactory.options.rooms;
       assertInRange(offer.rooms, min, max);
     });
 
@@ -115,29 +117,32 @@ describe(`generateEntity`, () => {
       assertObjectProperty(offer, `guests`);
       assertType(offer.guests, `number`);
 
-      const {min, max} = options.offer.guests;
+      const {min, max} = offerFactory.options.guests;
       assertInRange(offer.guests, min, max);
     });
 
     it(`should have valid 'checkin' property`, () => {
       assertObjectProperty(offer, `checkin`);
       assertType(offer.checkin, `string`);
-      assertArrayMember(options.offer.checkin, offer.checkin);
+      assertArrayMember(offerFactory.options.checkin, offer.checkin);
     });
 
     it(`should have valid 'checkout' property`, () => {
       assertObjectProperty(offer, `checkout`);
       assertType(offer.checkout, `string`);
-      assertArrayMember(options.offer.checkout, offer.checkout);
+      assertArrayMember(offerFactory.options.checkout, offer.checkout);
     });
 
     it(`should have valid 'features' property`, () => {
       assertObjectProperty(offer, `features`);
       assertArray(offer.features, `string`);
 
-      const unequalLength = (item) => (item.length !== entity.length);
+      const unequalLength = (item) => (item.offer.features.length !== offer.features.length);
       assert(entities.some(unequalLength), `length of 'features' array should be random`);
-      assert((new Set(offer.features)).size === offer.features, `elements of 'features' array should be unique`);
+
+      const featuresSet = new Set(offer.features);
+      const featuresCount = offer.features.length;
+      assert(featuresSet.size === featuresCount || featuresCount === 1, `elements of 'features' array should be unique`);
     });
 
     it(`should have valid 'description' property`, () => {
@@ -151,11 +156,11 @@ describe(`generateEntity`, () => {
       assertArray(offer.photos, `string`);
 
       for (const photo of offer.photos) {
-        assertArrayMember(options.offer.photos, photo);
+        assertArrayMember(offerFactory.options.photos, photo);
       }
 
-      const unequalOrder = (item) => (item.join() !== entity.join());
-      assert(entities.some(unequalOrder), `elements order of 'photos' array should be random`);
+      const unequalToEntity = (item) => (item.offer.photos.join() !== offer.photos.join());
+      assert(entities.some(unequalToEntity), `elements order of 'photos' array should be random`);
     });
   });
 
@@ -170,7 +175,7 @@ describe(`generateEntity`, () => {
       assertObjectProperty(location, `x`);
       assertType(location.x, `number`);
 
-      const {min, max} = options.location.x;
+      const {min, max} = locationFactory.options.x;
       assertInRange(location.x, min, max);
     });
 
@@ -178,7 +183,7 @@ describe(`generateEntity`, () => {
       assertObjectProperty(location, `y`);
       assertType(location.y, `number`);
 
-      const {min, max} = options.location.y;
+      const {min, max} = locationFactory.options.y;
       assertInRange(location.y, min, max);
     });
   });
