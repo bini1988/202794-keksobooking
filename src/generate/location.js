@@ -1,8 +1,6 @@
 const {getRandomInt} = require(`./utils`);
 
 const location = {
-  _x: 0,
-  _y: 0,
   options: {
     x: {
       min: 300,
@@ -15,16 +13,11 @@ const location = {
   },
   get x() {
     const {min, max} = this.options.x;
-    this._x = getRandomInt(min, max);
-    return this._x;
+    return getRandomInt(min, max);
   },
   get y() {
     const {min, max} = this.options.y;
-    this._y = getRandomInt(min, max);
-    return this._y;
-  },
-  get address() {
-    return `${this._x}, ${this._y}`;
+    return getRandomInt(min, max);
   },
   get entity() {
     return {

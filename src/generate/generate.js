@@ -5,9 +5,7 @@ const offerFactory = require(`./offer`);
 function generateEntity() {
   const author = authorFactory.entity;
   const location = locationFactory.entity;
-  const offer = offerFactory.entity;
-
-  offer.address = locationFactory.address;
+  const offer = offerFactory.entity(location);
 
   return {author, offer, location};
 }
