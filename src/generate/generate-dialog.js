@@ -1,10 +1,15 @@
 const readline = require(`readline`);
+const util = require(`util`);
+const fs = require(`fs`);
+
+const fopen = util.promisify(fs.open);
+const fclose = util.promisify(fs.close);
 
 const ASK_TO_GENERATE = `ASK_TO_GENERATE`;
 const ASK_NUMBER_OF_ELEMENTS = `ASK_NUMBER_OF_ELEMENTS`;
 const ASK_FILE_PATH = `ASK_FILE_PATH`;
 const ASK_FILE_REWRITE = `ASK_FILE_REWRITE`;
-const SAY_SAVED = `SAY_SAVED`;
+const SAVE_DATA = `SAVE_DATA`;
 const QUIT = `QUIT`;
 
 const rl = readline.createInterface({
@@ -12,33 +17,59 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const doAction = {
-  confirmGenerate(answer) {
-    if (answer.match(/^д(а)?$/i)) {
-      return {action: ASK_NUMBER_OF_ELEMENTS};
-    }
-    if (answer.match(/^н(ет)?$/i)) {
-      return {action: QUIT};
-    }
-    return {action: ASK_TO_GENERATE};
-  },
-  readNumberOfElements(input) {
-    const count = parseInt(input, 10);
 
-    if (Number.isInteger(count)) {
-      return {action: ASK_FILE_PATH, count};
-    }
+function confirmGenerate(answer) {
+  if (answer.match(/^д(а)?$/i)) {
     return {action: ASK_NUMBER_OF_ELEMENTS};
-  },
-  confirmFilePath: () => {
-    console.log();
+  }
+  if (answer.match(/^н(ет)?$/i)) {
+    return {action: QUIT};
+  }
+  return {action: ASK_TO_GENERATE};
+}
 
+function readNumberOfElements(input) {
+  const count = parseInt(input, 10);
+
+  if (Number.isInteger(count) && count > 0) {
+    return {action: ASK_FILE_PATH, count};
+  } else {
+    console.log(`Пожалуйста введите целое число больше 0!`);
+    return {action: ASK_NUMBER_OF_ELEMENTS};
+  }
+}
+
+async function checkoutFilePath(path) {
+  let fd = null;
+
+  try {
+    fd = await fopen(path, `wx`);
+
+    return {action: SAVE_DATA, fd};
+
+  } catch (err) {
+
+    fclose(fd);
+
+    if (err.code === `EEXIST`) {
+      return {action: ASK_FILE_REWRITE};
+    }
+    console.log(`Ошибка записи данных в файл: ${err}`);
+  }
+
+  return {action: ASK_FILE_PATH};
+}
+
+
+function confirmRewrite(answer) {
+  if (answer.match(/^д(а)?$/i)) {
+    return {action: SAVE_DATA};
+  }
+  if (answer.match(/^н(ет)?$/i)) {
     return {action: ASK_FILE_PATH};
-  },
-  [ASK_FILE_REWRITE]: () => {
-
-  },
-};
+  }
+  return {action: ASK_FILE_REWRITE};
+}
 
 function ask(question) {
   return new Promise((resolve) => {
@@ -46,15 +77,15 @@ function ask(question) {
   });
 }
 
-function say(message) {
-  return Promise.resolve(message).then(console.log);
-}
+// function say(message) {
+//   return Promise.resolve(message).then(console.log);
+// }
 
 function mergeWith(state) {
   return (newState) => Object.assign({}, state, newState);
 }
 
-function* dialog() {
+async function dialog() {
   let state = {
     action: ASK_TO_GENERATE
   };
@@ -62,27 +93,27 @@ function* dialog() {
   while (state.action !== QUIT) {
     switch (state.action) {
       case ASK_TO_GENERATE:
-        state = yield ask(`Сгенерировать тестовые данные? (Да/Нет)`)
-            .then(doAction.confirmGenerate)
+        state = await ask(`Сгенерировать тестовые данные? (Да/Нет) :`)
+            .then(confirmGenerate)
             .then(mergeWith(state));
         break;
       case ASK_NUMBER_OF_ELEMENTS:
-        state = yield ask(`Cколько элементов в соответствии с проектом нужно создать?`)
-            .then(doAction.readNumberOfElements)
+        state = await ask(`Cколько элементов в соответствии с проектом нужно создать? (от 1 и более) :`)
+            .then(readNumberOfElements)
             .then(mergeWith(state));
         break;
       case ASK_FILE_PATH:
-        state = yield ask(`Укажите путь до файла в котором необходимо сохранить данные?`)
-            .then(doAction.confirmFilePath)
+        state = await ask(`Укажите путь до файла в котором необходимо сохранить данные? :`)
+            .then(checkoutFilePath)
             .then(mergeWith(state));
         break;
       case ASK_FILE_REWRITE:
-        state = yield ask(`Такой файл уже существует, нужно ли его перезаписать?`)
-            .then(doAction.ASK_FILE_REWRITE)
+        state = await ask(`Такой файл уже существует, нужно ли его перезаписать? (Да/Нет) :`)
+            .then(confirmRewrite)
             .then(mergeWith(state));
         break;
-      case SAY_SAVED:
-        say(`Данные успешно записаны в файл!`);
+      case SAVE_DATA:
+        // say(`Данные успешно записаны в файл!`);
         break;
     }
   }
@@ -90,23 +121,9 @@ function* dialog() {
   rl.close();
 }
 
-function go(generator) {
-
-  function runTo(state) {
-    if (!state.done) {
-      return state.value
-          .then((result) => runTo(generator.next(result)))
-          .catch(console.log);
-    }
-    return state.value;
-  }
-
-  return runTo(generator.next());
-}
-
 module.exports = {
-  showGenerateDialog() {
-    go(dialog());
+  async showGenerateDialog() {
+    await dialog();
   }
 };
 
