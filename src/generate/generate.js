@@ -10,6 +10,18 @@ function generateEntity() {
   return {author, offer, location};
 }
 
+function generateEntities(count = 0) {
+  const entities = [];
+
+  for (let index = 0; index < count; index++) {
+    entities.push(generateEntity());
+  }
+
+  return entities;
+}
+
+
 module.exports = {
   generateEntity,
+  generateEntities,
 };

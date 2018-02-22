@@ -1,9 +1,11 @@
 const readline = require(`readline`);
 const util = require(`util`);
 const fs = require(`fs`);
+const {generateEntities} = require(`./generate`);
 
 const fopen = util.promisify(fs.open);
 const fclose = util.promisify(fs.close);
+const fwrite = util.promisify(fs.write);
 
 const ASK_TO_GENERATE = `ASK_TO_GENERATE`;
 const ASK_NUMBER_OF_ELEMENTS = `ASK_NUMBER_OF_ELEMENTS`;
@@ -18,43 +20,66 @@ const rl = readline.createInterface({
 });
 
 
-function confirmGenerate(answer) {
-  if (answer.match(/^д(а)?$/i)) {
-    return {action: ASK_NUMBER_OF_ELEMENTS};
-  }
-  if (answer.match(/^н(ет)?$/i)) {
-    return {action: QUIT};
-  }
-  return {action: ASK_TO_GENERATE};
+function ask(question) {
+  return new Promise((resolve) => {
+    rl.question(`${question} `, resolve);
+  });
 }
 
-function readNumberOfElements(input) {
+function isYes(answer) {
+  return answer.match(/^д(а)?$/i);
+}
+
+function isNo(answer) {
+  return answer.match(/^н(ет)?$/i);
+}
+
+function isUInt(number) {
+  return Number.isInteger(number) && (number > 0);
+}
+
+function take(state) {
+  return Promise.resolve(state);
+}
+
+function merge(state) {
+  return (newState) => Object.assign({}, state, newState);
+}
+
+
+function confirmGenerate(answer) {
+  if (isYes(answer)) {
+    return {action: ASK_NUMBER_OF_ELEMENTS};
+  } else if (isNo(answer)) {
+    return {action: QUIT};
+  } else {
+    return {action: ASK_TO_GENERATE};
+  }
+}
+
+function readNumber(input) {
   const count = parseInt(input, 10);
 
-  if (Number.isInteger(count) && count > 0) {
+  if (isUInt(count)) {
     return {action: ASK_FILE_PATH, count};
   } else {
-    console.log(`Пожалуйста введите целое число больше 0!`);
     return {action: ASK_NUMBER_OF_ELEMENTS};
   }
 }
 
-async function checkoutFilePath(path) {
-  let fd = null;
-
+async function openFile(path) {
   try {
-    fd = await fopen(path, `wx`);
-
-    return {action: SAVE_DATA, fd};
-
+    return {
+      action: SAVE_DATA,
+      fd: await fopen(path, `wx`),
+      path
+    };
   } catch (err) {
-
-    fclose(fd);
-
     if (err.code === `EEXIST`) {
-      return {action: ASK_FILE_REWRITE};
+      return {action: ASK_FILE_REWRITE, path};
     }
-    console.log(`Ошибка записи данных в файл: ${err}`);
+    console.log(`Не удалось открыть файл '${path}' на запись`);
+    console.log(err);
   }
 
   return {action: ASK_FILE_PATH};
@@ -62,32 +87,40 @@ async function checkoutFilePath(path) {
 
 
 function confirmRewrite(answer) {
-  if (answer.match(/^д(а)?$/i)) {
+  if (isYes(answer)) {
     return {action: SAVE_DATA};
-  }
-  if (answer.match(/^н(ет)?$/i)) {
+  } else if (isNo(answer)) {
     return {action: ASK_FILE_PATH};
+  } else {
+    return {action: ASK_FILE_REWRITE};
   }
-  return {action: ASK_FILE_REWRITE};
 }
 
-function ask(question) {
-  return new Promise((resolve) => {
-    rl.question(`${question} `, resolve);
-  });
-}
+async function saveData({count, path, fd}) {
+  try {
 
-// function say(message) {
-//   return Promise.resolve(message).then(console.log);
-// }
+    fd = fd || await fopen(path, `w`);
 
-function mergeWith(state) {
-  return (newState) => Object.assign({}, state, newState);
+    const entities = generateEntities(count);
+
+    await fwrite(fd, JSON.stringify(entities, null, 2), 0, `utf-8`);
+
+    console.log(`Данные были успешно записаны в файл '${path}'`);
+  } catch (err) {
+    console.log(`Не удалось сохранить данные в файл '${path}'`);
+    console.log(err);
+  } finally {
+    fclose(fd).catch(console.log);
+    return {action: QUIT};
+  }
 }
 
 async function dialog() {
   let state = {
-    action: ASK_TO_GENERATE
+    action: ASK_TO_GENERATE,
+    count: 0,
+    path: ``,
+    fd: null
   };
 
   while (state.action !== QUIT) {
@@ -95,25 +128,27 @@ async function dialog() {
       case ASK_TO_GENERATE:
         state = await ask(`Сгенерировать тестовые данные? (Да/Нет) :`)
             .then(confirmGenerate)
-            .then(mergeWith(state));
+            .then(merge(state));
         break;
       case ASK_NUMBER_OF_ELEMENTS:
         state = await ask(`Cколько элементов в соответствии с проектом нужно создать? (от 1 и более) :`)
-            .then(readNumberOfElements)
-            .then(mergeWith(state));
+            .then(readNumber)
+            .then(merge(state));
         break;
       case ASK_FILE_PATH:
         state = await ask(`Укажите путь до файла в котором необходимо сохранить данные? :`)
-            .then(checkoutFilePath)
-            .then(mergeWith(state));
+            .then(await openFile)
+            .then(merge(state));
         break;
       case ASK_FILE_REWRITE:
         state = await ask(`Такой файл уже существует, нужно ли его перезаписать? (Да/Нет) :`)
             .then(confirmRewrite)
-            .then(mergeWith(state));
+            .then(merge(state));
         break;
       case SAVE_DATA:
-        // say(`Данные успешно записаны в файл!`);
+        state = await take(state)
+            .then(await saveData)
+            .then(merge(state));
         break;
     }
   }
@@ -126,13 +161,3 @@ module.exports = {
     await dialog();
   }
 };
-
-// Если пользователь запустил программу без параметров, то программа должна поприветствовать пользователя и предложить сгенерировать данные
-
-// Программа должна спросить сколько элементов в соответствии с проектом нужно создать
-
-// Попросить указать путь до файла в котором сохранить данные
-
-// Если такой файл уже существует, то спросить нужно ли его перезаписать
-
-// Дополнительно: покрыть код создания и перезаписи файлов тестами
