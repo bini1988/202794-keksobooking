@@ -38,12 +38,8 @@ function isUInt(number) {
   return Number.isInteger(number) && (number > 0);
 }
 
-function take(state) {
-  return Promise.resolve(state);
-}
-
-function merge(state) {
-  return (newState) => Object.assign({}, state, newState);
+function merge(state, newState) {
+  return Object.assign({}, state, newState);
 }
 
 
@@ -52,9 +48,8 @@ function confirmGenerate(answer) {
     return {action: ASK_NUMBER_OF_ELEMENTS};
   } else if (isNo(answer)) {
     return {action: QUIT};
-  } else {
-    return {action: ASK_TO_GENERATE};
   }
+  return {action: ASK_TO_GENERATE};
 }
 
 function readNumber(input) {
@@ -62,9 +57,8 @@ function readNumber(input) {
 
   if (isUInt(count)) {
     return {action: ASK_FILE_PATH, count};
-  } else {
-    return {action: ASK_NUMBER_OF_ELEMENTS};
   }
+  return {action: ASK_NUMBER_OF_ELEMENTS};
 }
 
 async function openFile(path) {
@@ -79,9 +73,8 @@ async function openFile(path) {
       return {action: ASK_FILE_REWRITE, path};
     }
     console.log(`Не удалось открыть файл '${path}' на запись`);
-    console.log(err);
+    console.log(err.message);
   }
-
   return {action: ASK_FILE_PATH};
 }
 
@@ -91,9 +84,8 @@ function confirmRewrite(answer) {
     return {action: SAVE_DATA};
   } else if (isNo(answer)) {
     return {action: ASK_FILE_PATH};
-  } else {
-    return {action: ASK_FILE_REWRITE};
   }
+  return {action: ASK_FILE_REWRITE};
 }
 
 async function saveData({count, path, fd}) {
@@ -108,56 +100,46 @@ async function saveData({count, path, fd}) {
     console.log(`Данные были успешно записаны в файл '${path}'`);
   } catch (err) {
     console.log(`Не удалось сохранить данные в файл '${path}'`);
-    console.log(err);
+    console.log(err.message);
   } finally {
-    fclose(fd).catch(console.log);
+    await fclose(fd);
     return {action: QUIT};
   }
 }
 
+async function reduce(state) {
+  switch (state.action) {
+    case ASK_TO_GENERATE:
+      const answer = await ask(`Сгенерировать тестовые данные? (Да/Нет) :`);
+      return confirmGenerate(answer);
+    case ASK_NUMBER_OF_ELEMENTS:
+      const input = await ask(`Cколько элементов в соответствии с проектом нужно создать? (от 1 и более) :`);
+      return readNumber(input);
+    case ASK_FILE_PATH:
+      const path = await ask(`Укажите путь до файла в котором необходимо сохранить данные? :`);
+      return await openFile(path);
+    case ASK_FILE_REWRITE:
+      const confirm = await ask(`Такой файл уже существует, нужно ли его перезаписать? (Да/Нет) :`);
+      return confirmRewrite(confirm);
+    case SAVE_DATA:
+      return await saveData(state);
+    default:
+      return state;
+  }
+}
+
 async function dialog() {
-  let state = {
-    action: ASK_TO_GENERATE,
-    count: 0,
-    path: ``,
-    fd: null
-  };
+  let state = {action: ASK_TO_GENERATE};
 
   while (state.action !== QUIT) {
-    switch (state.action) {
-      case ASK_TO_GENERATE:
-        state = await ask(`Сгенерировать тестовые данные? (Да/Нет) :`)
-            .then(confirmGenerate)
-            .then(merge(state));
-        break;
-      case ASK_NUMBER_OF_ELEMENTS:
-        state = await ask(`Cколько элементов в соответствии с проектом нужно создать? (от 1 и более) :`)
-            .then(readNumber)
-            .then(merge(state));
-        break;
-      case ASK_FILE_PATH:
-        state = await ask(`Укажите путь до файла в котором необходимо сохранить данные? :`)
-            .then(await openFile)
-            .then(merge(state));
-        break;
-      case ASK_FILE_REWRITE:
-        state = await ask(`Такой файл уже существует, нужно ли его перезаписать? (Да/Нет) :`)
-            .then(confirmRewrite)
-            .then(merge(state));
-        break;
-      case SAVE_DATA:
-        state = await take(state)
-            .then(await saveData)
-            .then(merge(state));
-        break;
-    }
+    state = merge(state, await reduce(state));
   }
 
   rl.close();
 }
 
 module.exports = {
-  async showGenerateDialog() {
-    await dialog();
+  showGenerateDialog() {
+    dialog().catch(console.log);
   }
 };
