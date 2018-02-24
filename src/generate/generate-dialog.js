@@ -14,16 +14,19 @@ const ASK_FILE_REWRITE = `ASK_FILE_REWRITE`;
 const SAVE_DATA = `SAVE_DATA`;
 const QUIT = `QUIT`;
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-
-function ask(question) {
-  return new Promise((resolve) => {
-    rl.question(`${question} `, resolve);
+async function ask(message) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
   });
+
+  const answer = await new Promise((resolve) => {
+    rl.question(`${message} `, resolve);
+  });
+
+  rl.close();
+
+  return answer;
 }
 
 function isYes(answer) {
@@ -134,12 +137,14 @@ async function dialog() {
   while (state.action !== QUIT) {
     state = merge(state, await reduce(state));
   }
-
-  rl.close();
 }
 
 module.exports = {
-  showGenerateDialog() {
-    dialog().catch(console.log);
+  async showGenerateDialog() {
+    try {
+      await dialog();
+    } catch (err) {
+      console.log(err.message);
+    }
   }
 };
