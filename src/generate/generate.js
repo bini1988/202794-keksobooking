@@ -8,7 +8,6 @@ function generateEntity() {
   const offer = offerFactory.entity;
 
   offer.address = locationFactory.address;
-
   return {author, offer, location};
 }
 
