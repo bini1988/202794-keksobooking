@@ -80,12 +80,16 @@ const offer = {
   get photos() {
     return shuffleArray(this.options.photos);
   },
-  get entity() {
+  address({x, y}) {
+    return `${x}, ${y}`;
+  },
+  entity(location) {
     return {
       title: this.title,
       price: this.price,
       type: this.type,
       rooms: this.rooms,
+      address: this.address(location),
       guests: this.guests,
       checkin: this.checkin,
       checkout: this.checkout,
