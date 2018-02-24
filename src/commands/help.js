@@ -12,7 +12,7 @@ module.exports = (commands = []) => ({
       const fieldName = `${name.padEnd(NAME_FIELD_WIDTH)}`.grey;
       const fieldDescription = `${description}`.green;
 
-      console.log(`--${fieldName} - ${fieldDescription};`);
+      console.log(`${fieldName} - ${fieldDescription};`);
     }
   }
 });
