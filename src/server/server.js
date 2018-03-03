@@ -12,12 +12,12 @@ app.get(`/`, function (req, res) {
   res.send(`Hello World!`);
 });
 
-module.exports = {
-  run(args) {
-    const [port = PORT] = args;
+app.run = function (args) {
+  const [port = PORT] = args;
 
-    app.listen(port, HOST_NAME, () => {
-      console.log(`[i] Server was successfully started at ${HOST_NAME}:${port}`);
-    });
-  }
+  app.listen(port, HOST_NAME, () => {
+    console.log(`[i] Server was successfully started at ${HOST_NAME}:${port}`);
+  });
 };
+
+module.exports = app;

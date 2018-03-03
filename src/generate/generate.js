@@ -20,7 +20,6 @@ function generateEntities(count = 0) {
   return entities;
 }
 
-
 module.exports = {
   generateEntity,
   generateEntities,

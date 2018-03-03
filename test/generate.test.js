@@ -5,7 +5,7 @@ const {
   assertArrayMember,
   assertArray,
   assertInRange
-} = require(`./utils`);
+} = require(`./assert-utils`);
 
 const {generateEntity} = require(`../src/generate/generate`);
 const locationFactory = require(`../src/generate/location`);
