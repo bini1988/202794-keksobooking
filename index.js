@@ -1,6 +1,6 @@
 const APP_VERSION = require(`./package.json`).version;
 const APP_AUTHOR = require(`./package.json`).author;
-const executeCommands = require(`./src/execute-commands`);
+const executeCommands = require(`./src/commands/execute`);
 const {show: showGenerateDialog} = require(`./src/generate/dialog`);
 
 if (process.argv.length < 3) {

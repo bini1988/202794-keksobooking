@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test:lint": "eslint .",
+    "test:lint-fix": "eslint . --fix",
     "test:mocha": "mocha",
     "test": "npm run test:lint && npm run test:mocha"
   },
@@ -28,7 +29,9 @@
     "supertest": "^3.0.0"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
     "colors": "^1.1.2",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "multer": "^1.3.0"
   }
 }

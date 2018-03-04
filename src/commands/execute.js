@@ -2,12 +2,12 @@
 const cmds = [];
 
 cmds.push(
-    require(`./commands/help`)(cmds),
-    require(`./commands/server`),
-    require(`./commands/author`),
-    require(`./commands/description`),
-    require(`./commands/license`),
-    require(`./commands/version`)
+    require(`./help`)(cmds),
+    require(`./server`),
+    require(`./author`),
+    require(`./description`),
+    require(`./license`),
+    require(`./version`)
 );
 
 function printCommandUnknown(cmd) {
