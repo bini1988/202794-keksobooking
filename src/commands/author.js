@@ -2,7 +2,8 @@ const APP_AUTHOR = require(`../../package.json`).author;
 
 module.exports = {
   name: `author`,
-  description: `вывод автора приложения`,
+  args: [],
+  description: `выводит информацию об авторе приложения`,
   execute() {
     console.log(`Author: ${APP_AUTHOR}`);
   }

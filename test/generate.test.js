@@ -1,28 +1,15 @@
 const assert = require(`assert`);
+const {
+  assertObjectProperty,
+  assertType,
+  assertArrayMember,
+  assertArray,
+  assertInRange
+} = require(`./assert-utils`);
+
 const {generateEntity} = require(`../src/generate/generate`);
 const locationFactory = require(`../src/generate/location`);
 const offerFactory = require(`../src/generate/offer`);
-
-function assertObjectProperty(obj, property, message) {
-  assert(obj.hasOwnProperty(property), message || `'${property}' property should exist`);
-}
-
-function assertType(value, type, message) {
-  assert(typeof value === type, message || `value should have ${type} type`);
-}
-
-function assertArrayMember(array, member) {
-  assert(array.includes(member), `value should be equal of one of array's element`);
-}
-
-function assertArray(value, type, message) {
-  assert(Array.isArray(value), message || `value should be Array`);
-  assert(value.every((item) => (typeof item === type)), message || `value should be Array<${type}>`);
-}
-
-function assertInRange(value, min, max) {
-  assert(value >= min && value <= max, `value should be in a range of ${min} to ${max}`);
-}
 
 function getEntities() {
   const entities = [];

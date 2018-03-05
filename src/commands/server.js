@@ -1,9 +1,10 @@
-const server = require(`../server/create-server`);
+const {run} = require(`../server/server`);
 
 module.exports = {
   name: `server`,
-  description: `запуск сервера на указанном порту`,
+  args: [{name: `PORT`}],
+  description: `запускает сервер на выбранном порту`,
   execute(args) {
-    server.run(args);
+    run(args);
   }
 };

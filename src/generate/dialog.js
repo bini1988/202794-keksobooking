@@ -139,12 +139,14 @@ async function dialog() {
   }
 }
 
-module.exports = {
-  async showGenerateDialog() {
-    try {
-      await dialog();
-    } catch (err) {
-      console.log(err.message);
-    }
+async function show() {
+  try {
+    await dialog();
+  } catch (err) {
+    console.log(err.message);
   }
+}
+
+module.exports = {
+  show,
 };

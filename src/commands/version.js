@@ -12,7 +12,8 @@ function colorizeVersion(version) {
 
 module.exports = {
   name: `version`,
-  description: `печатает версию приложения`,
+  args: [],
+  description: `выводит информацию о текущей версии приложения`,
   execute() {
     console.log(`v${colorizeVersion(APP_VERSION)}`);
   }
