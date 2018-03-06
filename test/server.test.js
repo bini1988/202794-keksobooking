@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
 
 const request = require(`supertest`);
-const {app} = require(`../src/server/server`);
+const {app} = require(`../src/server`);
 const assert = require(`assert`);
 const {
   assertObjectProperty,

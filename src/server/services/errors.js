@@ -42,6 +42,7 @@ class NotFoundError extends ApplicationError {
 }
 
 module.exports = {
+  ApplicationError,
   ValidationError,
   NotFoundError
 };

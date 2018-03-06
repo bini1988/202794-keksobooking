@@ -1,4 +1,4 @@
-const {generateEntities} = require(`../generate/generate`);
+const {generateEntities} = require(`../../../generate`);
 
 const ENTITIES_COUNT = 30;
 

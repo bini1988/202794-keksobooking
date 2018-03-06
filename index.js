@@ -1,13 +1,13 @@
 const APP_VERSION = require(`./package.json`).version;
 const APP_AUTHOR = require(`./package.json`).author;
-const executeCommands = require(`./src/commands/execute`);
-const {show: showGenerateDialog} = require(`./src/generate/dialog`);
+const commands = require(`./src/commands`);
+const {dialog} = require(`./src/generate`);
 
 if (process.argv.length < 3) {
   console.log(`Keksobooking App v${APP_VERSION}`);
   console.log(`Author: ${APP_AUTHOR}`);
 
-  showGenerateDialog();
+  dialog.show();
 } else {
-  executeCommands(process.argv.slice(2));
+  commands.execute(process.argv.slice(2));
 }
