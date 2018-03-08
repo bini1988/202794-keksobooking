@@ -50,7 +50,16 @@ module.exports = {
   post(req, res) {
     const offer = req.body;
 
-    // offers.add(offer);
+    if (req.files && req.files.avatar) {
+      offer.avatar = req.files.avatar[0];
+    }
+
+    if (req.files && req.files.preview) {
+      offer.preview = req.files.preview[0];
+    }
+
+    offers.add(offer);
+
     res.status(200).json(offer);
   },
 };

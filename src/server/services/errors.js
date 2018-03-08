@@ -14,6 +14,10 @@ class ApplicationError extends Error {
     return this._errors.length === 0;
   }
 
+  get hasErrors() {
+    return this._errors.length > 0;
+  }
+
   add(errorMessage) {
     const error = this.message;
     this._errors.push({error, errorMessage});
