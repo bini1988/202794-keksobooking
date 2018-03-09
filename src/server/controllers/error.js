@@ -1,9 +1,5 @@
-const {ValidationError, NotFoundError} = require(`../controllers/errors`);
+const {ValidationError, NotFoundError} = require(`../services/errors`);
 
-function handle404Error() {
-  const error = new NotFoundError();
-  throw error.add(`Resourse not found`);
-}
 
 function handleErrors(err, req, res, _next) {
   console.error(`[e] Error: ${err.message}`);
@@ -25,6 +21,5 @@ function handleErrors(err, req, res, _next) {
 }
 
 module.exports = {
-  handleErrors,
-  handle404Error,
+  index: handleErrors,
 };

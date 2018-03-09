@@ -1,7 +1,7 @@
 /* eslint-disable max-nested-callbacks */
 
 const request = require(`supertest`);
-const {app} = require(`../src/server/server`);
+const {app} = require(`../src/server`);
 const assert = require(`assert`);
 const {
   assertObjectProperty,
@@ -186,22 +186,18 @@ describe(`Server`, function () {
   describe(`POST api/offers`, function () {
     it(`respond with json`, function () {
       const data = {
-        "name": `Pavel`,
         "title": `Маленькая квартирка рядом с парком`,
-        "address": `102-0075 Tōkyō-to, Chiyoda-ku, Sanbanchō`,
         "description": `Маленькая чистая квратира на краю парка. Без интернета, регистрации и СМС.`,
-        "price": 30000,
         "type": `flat`,
+        "price": 30000,
+        "address": `102-0075 Tōkyō-to, Chiyoda-ku, Sanbanchō`,
+        "timein": `09:00`,
+        "timeout": `07:00`,
         "rooms": 1,
         "guests": 1,
-        "checkin": `9:00`,
-        "checkout": `7:00`,
-        "features": [`elevator`, `conditioner`]
+        "features": [`elevator`, `conditioner`],
+        "name": `Pavel`,
       };
-
-      function assertResponse(response) {
-        assert.deepEqual(response, data, `expect given data object`);
-      }
 
       const req = request(app)
           .post(`/api/offers`)
@@ -215,7 +211,99 @@ describe(`Server`, function () {
 
       return req.attach(`avatar`, `test/avatar.png`)
           .expect(`Content-Type`, /json/)
-          .expect(200)
+          .expect(200);
+    });
+
+    it(`respond with bad request for required fields`, function () {
+      const ERROR = `Validation Error`;
+      const ERROR_MESSAGE = `is required`;
+      const REQURED_FIELDS = [
+        `title`, `description`, `type`, `price`, `address`, `timein`, `timeout`, `rooms`];
+
+      function assertResponse(response) {
+        assertArray(response, `object`);
+        assert(response.length > 0, `expect at least one item in array`);
+
+        REQURED_FIELDS.forEach((item) => {
+          const obj = response.find(({fieldName}) => fieldName === item);
+
+          assert(obj, `expect error object with property "fieldName" equal to "${item}"`);
+          assert(obj.error === ERROR, `expect error object with property "error" equal to "${ERROR}"`);
+          assert(obj.errorMessage === ERROR_MESSAGE, `expect error object with property "errorMessage" equal to "${ERROR_MESSAGE}"`);
+        });
+      }
+
+      return request(app)
+          .post(`/api/offers`)
+          .set(`Accept`, `application/json`)
+          .send({})
+          .expect(`Content-Type`, /json/)
+          .expect(400)
+          .then((response) => response.body)
+          .then(assertResponse);
+    });
+
+    it(`respond with bad request for incorrect values`, function () {
+      const ERROR = `Validation Error`;
+      const ERROR_MESSAGE = `incorrect value`;
+      const REQURED_FIELDS = [
+        `title`, `type`, `price`, `timein`, `timeout`, `rooms`, `guests`];
+
+      function assertResponse(response) {
+        assertArray(response, `object`);
+        assert(response.length > 0, `expect at least one item in array`);
+
+        REQURED_FIELDS.forEach((item) => {
+          const obj = response.find(({fieldName}) => fieldName === item);
+
+          assert(obj, `expect error object with property "fieldName" equal to "${item}"`);
+          assert(obj.error === ERROR, `expect error object with property "error" equal to "${ERROR}"`);
+          assert(obj.errorMessage === ERROR_MESSAGE, `expect error object with property "errorMessage" equal to "${ERROR_MESSAGE}"`);
+        });
+      }
+
+      return request(app)
+          .post(`/api/offers`)
+          .set(`Accept`, `application/json`)
+          .send({
+            title: `Invalid value`,
+            type: `Invalid value`,
+            price: -100,
+            timein: `Invalid value`,
+            timeout: `Invalid value`,
+            rooms: -100,
+            guests: -100,
+          })
+          .expect(`Content-Type`, /json/)
+          .expect(400)
+          .then((response) => response.body)
+          .then(assertResponse);
+    });
+
+    it(`respond with bad request for incorrect attachmets`, function () {
+      const ERROR = `Validation Error`;
+      const ERROR_MESSAGE = `incorrect attachment type`;
+
+      function assertResponse(response) {
+        assertArray(response, `object`);
+        assert(response.length > 0, `expect at least one item in array`);
+
+        [`avatar`, `preview`].forEach((item) => {
+          const obj = response.find(({fieldName}) => fieldName === item);
+
+          assert(obj, `expect error object with property "fieldName" equal to "${item}"`);
+          assert(obj.error === ERROR, `expect error object with property "error" equal to "${ERROR}"`);
+          assert(obj.errorMessage === ERROR_MESSAGE, `expect error object with property "errorMessage" equal to "${ERROR_MESSAGE}"`);
+        });
+      }
+
+      return request(app)
+          .post(`/api/offers`)
+          .set(`Accept`, `application/json`)
+          .attach(`avatar`, `test/server.test.js`)
+          .attach(`preview`, `test/server.test.js`)
+          .expect(`Content-Type`, /json/)
+          .expect(400)
           .then((response) => response.body)
           .then(assertResponse);
     });

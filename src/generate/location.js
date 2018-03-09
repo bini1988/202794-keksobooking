@@ -1,4 +1,4 @@
-const {getRandomInt} = require(`./utils`);
+const {getRandomInt} = require(`../utils`);
 
 const location = {
   options: {

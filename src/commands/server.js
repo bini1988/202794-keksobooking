@@ -1,4 +1,4 @@
-const {run} = require(`../server/server`);
+const {run} = require(`../server`);
 
 module.exports = {
   name: `server`,

@@ -1,4 +1,4 @@
-const {getRandomInt, getRandomArrayElement, shuffleArray} = require(`./utils`);
+const {getRandomInt, getRandomArrayElement, shuffleArray} = require(`../utils`);
 
 const offer = {
   _titles: [],

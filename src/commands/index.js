@@ -36,7 +36,7 @@ function parseCmds(arr) {
   return cmdsArr;
 }
 
-function executeCommands(args) {
+function execute(args) {
   const cmdsArr = parseCmds(args);
 
   for (const cmd of cmdsArr) {
@@ -52,4 +52,6 @@ function executeCommands(args) {
   }
 }
 
-module.exports = executeCommands;
+module.exports = {
+  execute,
+};
