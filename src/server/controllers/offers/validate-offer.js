@@ -178,6 +178,16 @@ const OFFER_FIELDS = [{
   get default() {
     return getRandomArrayElement(DEFAULT_NAMES);
   },
+}, {
+  name: `date`,
+  required: true,
+  errorMessage: `incorrect value`,
+  normalize(value) {
+    return parseInt(value, 10);
+  },
+  validations: [
+    hasType(`number`),
+  ],
 }];
 
 function isValid(validations, value) {
@@ -187,7 +197,7 @@ function isValid(validations, value) {
 }
 
 module.exports = {
-  validate(obj) {
+  getValidatedOffer(obj) {
     const error = new ValidationError();
     const hasOwnProperty = Object.prototype.hasOwnProperty;
     const out = {};

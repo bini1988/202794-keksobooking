@@ -1,3 +1,4 @@
+const {Duplex} = require(`stream`);
 
 /**
  * Имеет ли переданное значение беззнаковый целый тип
@@ -17,7 +18,17 @@ function asyncMiddleware(fn) {
   };
 }
 
+function toStream(buffer) {
+  const stream = new Duplex();
+
+  stream.push(buffer);
+  stream.push(null);
+
+  return stream;
+}
+
 module.exports = {
   isUnsignedInteger,
   asyncMiddleware,
+  toStream,
 };

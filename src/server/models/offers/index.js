@@ -1,25 +1,37 @@
-const {generateEntities} = require(`../../../generate`);
 
-const ENTITIES_COUNT = 30;
-
-const entities = generateEntities(ENTITIES_COUNT);
-
-module.exports = {
-  get(skip = 0, limit = ENTITIES_COUNT) {
-    return entities.slice(skip, skip + limit);
-  },
-  getByDate(date) {
-    return entities.find((item) => item.date === date);
-  },
-  add(offer) {
-    const date = Date.now().valueOf();
-
-    offer.date = date;
-    entities.push(offer);
-
-    return date;
-  },
-  count() {
-    return ENTITIES_COUNT;
+class Offers {
+  constructor(collection, bucket) {
+    this._collection = collection;
+    this._bucket = bucket;
   }
-};
+
+  async get(skip = 0, limit = 0) {
+    return await this._collection
+        .find({}, {skip, limit})
+        .toArray();
+  }
+
+  async getByDate(date) {
+    const offers = await this._collection
+        .find({date})
+        .toArray();
+
+    return offers[0];
+  }
+
+  async insert(offer) {
+    return await this._collection
+        .insertOne(offer);
+  }
+
+  async count() {
+    return await this._collection
+        .count({});
+  }
+
+  get files() {
+    return this._bucket;
+  }
+}
+
+module.exports = Offers;

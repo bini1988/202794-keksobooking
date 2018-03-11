@@ -1,4 +1,4 @@
-const offers = require(`../../models/offers`);
+const models = require(`../../models`);
 const {ValidationError} = require(`../../services/errors`);
 const {isUnsignedInteger, asyncMiddleware} = require(`../../services/utils`);
 
@@ -30,8 +30,8 @@ module.exports = asyncMiddleware(async (req, res) => {
   skip = (skip) ? parseInt(skip, 10) : DEFAULT_ITEMS_SKIP;
   limit = (limit) ? parseInt(limit, 10) : DEFAULT_ITEMS_LIMIT;
 
-  const data = offers.get(skip, limit);
-  const total = offers.count();
+  const data = await models.offers.get(skip, limit);
+  const total = await models.offers.count();
 
   res.status(200).json({data, skip, limit, total});
 });
