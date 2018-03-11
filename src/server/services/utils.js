@@ -9,6 +9,15 @@ function isUnsignedInteger(value) {
   return (Number.isInteger(number) && number >= 0);
 }
 
+function asyncMiddleware(fn) {
+  return (req, res, next) => {
+    return Promise
+        .resolve(fn(req, res, next))
+        .catch(next);
+  };
+}
+
 module.exports = {
   isUnsignedInteger,
+  asyncMiddleware,
 };

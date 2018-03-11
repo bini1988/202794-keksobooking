@@ -1,6 +1,8 @@
 const express = require(`express`);
 const multer = require(`multer`);
-const offers = require(`../../services/offers`);
+const getOffers = require(`./get-offer`);
+const getOfferByDate = require(`./get-offer-by-date`);
+const postOffer = require(`./post-offer`);
 
 const upload = multer({dest: `uploads/`});
 const offerUpload = upload.fields([
@@ -10,8 +12,8 @@ const offerUpload = upload.fields([
 
 const router = express.Router(); // eslint-disable-line new-cap
 
-router.get(`/offers`, offers.get);
-router.post(`/offers`, offerUpload, offers.post);
-router.get(`/offers/:date`, offers.getByDate);
+router.get(`/offers`, getOffers);
+router.post(`/offers`, offerUpload, postOffer);
+router.get(`/offers/:date`, getOfferByDate);
 
 module.exports = router;

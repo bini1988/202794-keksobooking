@@ -1,5 +1,4 @@
 const {generateEntities} = require(`../../../generate`);
-const {validate} = require(`./validate`);
 
 const ENTITIES_COUNT = 30;
 
@@ -12,9 +11,8 @@ module.exports = {
   getByDate(date) {
     return entities.find((item) => item.date === date);
   },
-  add(item) {
+  add(offer) {
     const date = Date.now().valueOf();
-    const offer = validate(item);
 
     offer.date = date;
     entities.push(offer);
