@@ -11,6 +11,7 @@ Thumbs.db
 npm-debug.log*
 node_modules/
 uploads/
+db/
 
 # Папка с собранными файлами проекта
 build/
