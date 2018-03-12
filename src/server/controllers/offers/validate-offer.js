@@ -73,7 +73,7 @@ const OFFER_FIELDS = [{
     hasMaxLength(ADDRESS_MAX_LENGTH),
   ],
 }, {
-  name: `timein`,
+  name: `checkin`,
   required: true,
   errorMessage: `incorrect value`,
   normalize(value) {
@@ -84,7 +84,7 @@ const OFFER_FIELDS = [{
     hasTimeFormat(),
   ],
 }, {
-  name: `timeout`,
+  name: `checkout`,
   required: true,
   errorMessage: `incorrect value`,
   normalize(value) {

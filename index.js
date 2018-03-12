@@ -1,3 +1,4 @@
+require(`dotenv`).config();
 const APP_VERSION = require(`./package.json`).version;
 const APP_AUTHOR = require(`./package.json`).author;
 const commands = require(`./src/commands`);
