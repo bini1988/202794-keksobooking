@@ -1,4 +1,3 @@
-const models = require(`../../models`);
 const {ValidationError} = require(`../../services/errors`);
 const {isUnsignedInteger, asyncMiddleware} = require(`../../services/utils`);
 
@@ -23,6 +22,8 @@ function validateQuery(query) {
 }
 
 module.exports = asyncMiddleware(async (req, res) => {
+  const models = req.app.locals.models;
+
   validateQuery(req.query);
 
   let {skip, limit} = req.query;

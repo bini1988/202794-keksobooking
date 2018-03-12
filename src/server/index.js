@@ -25,7 +25,9 @@ module.exports = {
     try {
       await models.init({url: DB_URL, dbName: DB_DATABASE_NAME});
 
-      console.log(`[i] Create db connection with ${DB_URL}`);
+      app.locals.models = models;
+
+      console.log(`[i] Create db connection with ${DB_URL} and init models`);
     } catch (err) {
       console.error(`[e] Failed to connect to MongoDB`, err);
       process.exit(1);

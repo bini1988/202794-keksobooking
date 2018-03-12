@@ -10,6 +10,7 @@ const {
   assertType
 } = require(`./assert-utils`);
 
+app.locals.models = require(`./models.mock.js`);
 
 describe(`Server`, function () {
 
