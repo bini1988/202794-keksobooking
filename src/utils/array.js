@@ -35,7 +35,6 @@ function shuffleArray(array) {
   return arr;
 }
 
-
 module.exports = {
   getRandomInt,
   getRandomArrayElement,

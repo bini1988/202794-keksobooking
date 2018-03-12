@@ -1,4 +1,4 @@
-const {getRandomInt} = require(`../utils`);
+const {getRandomInt} = require(`../utils/array`);
 const locationFactory = require(`./location`);
 const authorFactory = require(`./author`);
 const offerFactory = require(`./offer`);

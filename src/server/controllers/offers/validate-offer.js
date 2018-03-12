@@ -1,30 +1,21 @@
-const {getRandomArrayElement} = require(`../../../utils`);
+const {getRandomArrayElement} = require(`../../../utils/array`);
+const {hasType, hasLength, hasMaxLength, oneOf, inRange, hasTimeFormat, isSet, subsetOf, hasMimeType} = require(`../../../utils/validation`);
 const {ValidationError} = require(`../../services/errors`);
+
 
 const TITLE_MIN_LENGTH = 30;
 const TITLE_MAX_LENGTH = 140;
 const DESCRIPTION_MIN_LENGTH = 0;
 const DESCRIPTION_MAX_LENGTH = 140;
-const OFFER_TYPE_ENUM = new Set([`flat`, `house`, `bungalo`, `palace`]);
 const MIN_PRICE = 1;
 const MAX_PRICE = 100000;
 const ADDRESS_MAX_LENGTH = 140;
-const TIME_STAMP_REGEXP = /^(([0-1]\d)|([2][0-3])):[0-5]\d$/i;
 const MIN_ROOMS = 0;
 const MAX_ROOMS = 1000;
 const MIN_GUESTS = 0;
 const MAX_GUESTS = 1000;
-const OFFER_FEATURES_ENUM = new Set([`dishwasher`, `elevator`, `conditioner`, `parking`, `washer`, `wifi`]);
 const DEFAULT_NAMES = [`Keks`, `Pavel`, `Nikolay`, `Alex`, `Ulyana`, `Anastasyia`, `Julia`];
-const IMG_MIMETYPES_ENUM = new Set([`image/gif`, `image/jpeg`, `image/png`]);
 
-function isSet(value) {
-  return (new Set(value)).size === value.length;
-}
-
-function isSubset(value, ofEnum) {
-  return value.every((item) => ofEnum.has(item));
-}
 
 const OFFER_FIELDS = [{
   name: `title`,
@@ -33,11 +24,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      (value.length >= TITLE_MIN_LENGTH) &&
-      (value.length <= TITLE_MAX_LENGTH);
-  },
+  validations: [
+    hasType(`string`),
+    hasLength(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH),
+  ],
 }, {
   name: `description`,
   required: true,
@@ -45,11 +35,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      (value.length >= DESCRIPTION_MIN_LENGTH) &&
-      (value.length <= DESCRIPTION_MAX_LENGTH);
-  },
+  validations: [
+    hasType(`string`),
+    hasLength(DESCRIPTION_MIN_LENGTH, DESCRIPTION_MAX_LENGTH),
+  ],
 }, {
   name: `type`,
   required: true,
@@ -57,10 +46,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim().toLowerCase();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      OFFER_TYPE_ENUM.has(value);
-  },
+  validations: [
+    hasType(`string`),
+    oneOf([`flat`, `house`, `bungalo`, `palace`]),
+  ],
 }, {
   name: `price`,
   required: true,
@@ -68,11 +57,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return parseInt(value, 10);
   },
-  isValid(value) {
-    return (typeof value === `number`) &&
-      (value >= MIN_PRICE) &&
-      (value <= MAX_PRICE);
-  },
+  validations: [
+    hasType(`number`),
+    inRange(MIN_PRICE, MAX_PRICE),
+  ],
 }, {
   name: `address`,
   required: true,
@@ -80,10 +68,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      (value.length <= ADDRESS_MAX_LENGTH);
-  },
+  validations: [
+    hasType(`string`),
+    hasMaxLength(ADDRESS_MAX_LENGTH),
+  ],
 }, {
   name: `timein`,
   required: true,
@@ -91,10 +79,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      (TIME_STAMP_REGEXP.test(value));
-  },
+  validations: [
+    hasType(`string`),
+    hasTimeFormat(),
+  ],
 }, {
   name: `timeout`,
   required: true,
@@ -102,10 +90,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
-  isValid(value) {
-    return (typeof value === `string`) &&
-      (TIME_STAMP_REGEXP.test(value));
-  },
+  validations: [
+    hasType(`string`),
+    hasTimeFormat(),
+  ],
 }, {
   name: `rooms`,
   required: true,
@@ -113,11 +101,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return parseInt(value, 10);
   },
-  isValid(value) {
-    return (typeof value === `number`) &&
-      (value >= MIN_ROOMS) &&
-      (value <= MAX_ROOMS);
-  },
+  validations: [
+    hasType(`number`),
+    inRange(MIN_ROOMS, MAX_ROOMS),
+  ],
 }, {
   name: `guests`,
   required: false,
@@ -125,11 +112,10 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return parseInt(value, 10);
   },
-  isValid(value) {
-    return (typeof value === `number`) &&
-      (value >= MIN_GUESTS) &&
-      (value <= MAX_GUESTS);
-  },
+  validations: [
+    hasType(`number`),
+    inRange(MIN_GUESTS, MAX_GUESTS),
+  ],
 }, {
   name: `features`,
   required: false,
@@ -139,11 +125,18 @@ const OFFER_FIELDS = [{
       return `${item}`.trim().toLowerCase();
     });
   },
-  isValid(value) {
-    return Array.isArray(value) &&
-      isSubset(value, OFFER_FEATURES_ENUM) &&
-      isSet(value);
-  },
+  validations: [
+    hasType(`array`),
+    isSet,
+    subsetOf([
+      `dishwasher`,
+      `elevator`,
+      `conditioner`,
+      `parking`,
+      `washer`,
+      `wifi`
+    ]),
+  ],
 }, {
   name: `avatar`,
   required: false,
@@ -151,9 +144,13 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return value;
   },
-  isValid(value) {
-    return value && IMG_MIMETYPES_ENUM.has(value.mimetype);
-  },
+  validations: [
+    hasMimeType([
+      `image/gif`,
+      `image/jpeg`,
+      `image/png`
+    ]),
+  ],
 }, {
   name: `preview`,
   required: false,
@@ -161,9 +158,13 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return value;
   },
-  isValid(value) {
-    return value && IMG_MIMETYPES_ENUM.has(value.mimetype);
-  },
+  validations: [
+    hasMimeType([
+      `image/gif`,
+      `image/jpeg`,
+      `image/png`
+    ]),
+  ],
 }, {
   name: `name`,
   required: false,
@@ -171,24 +172,40 @@ const OFFER_FIELDS = [{
   normalize(value) {
     return `${value}`.trim();
   },
+  validations: [
+    hasType(`string`),
+  ],
   get default() {
     return getRandomArrayElement(DEFAULT_NAMES);
   },
-  isValid(value) {
-    return (typeof value === `string`);
+}, {
+  name: `date`,
+  required: true,
+  errorMessage: `incorrect value`,
+  normalize(value) {
+    return parseInt(value, 10);
   },
+  validations: [
+    hasType(`number`),
+  ],
 }];
 
+function isValid(validations, value) {
+  return validations
+      .map((validate) => validate(value))
+      .every((item) => item === true);
+}
+
 module.exports = {
-  validate(obj) {
+  getValidatedOffer(obj) {
     const error = new ValidationError();
     const hasOwnProperty = Object.prototype.hasOwnProperty;
     const out = {};
 
     for (const field of OFFER_FIELDS) {
-      const {name, required, normalize, isValid} = field;
+      const {name, required, normalize, validations} = field;
       const value = normalize(obj[name]);
-      const valid = isValid(value);
+      const valid = isValid(validations, value);
       const contains = hasOwnProperty.call(obj, name);
 
       if (!contains && required) {

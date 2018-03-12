@@ -10,10 +10,6 @@ class ApplicationError extends Error {
     return this._errors;
   }
 
-  get isEmpty() {
-    return this._errors.length === 0;
-  }
-
   get hasErrors() {
     return this._errors.length > 0;
   }
