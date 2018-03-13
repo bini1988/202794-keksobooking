@@ -1,4 +1,6 @@
 
+const TIMESTAMP_REGEXP = /^(([0-1]\d)|([2][0-3])):[0-5]\d$/i;
+
 /**
  * Возвращает функцию проверки имеет ли переданное значени указанный тип
  * @param  {String}   type  проверяемый тип
@@ -65,7 +67,7 @@ function inRange(min = 0, max = min) {
  * @param  {RegExp}  regexp используемое для проверки герулярное выражение
  * @return {Function}       функция принимающая проверяемое значение
  */
-function hasTimeFormat(regexp = /^(([0-1]\d)|([2][0-3])):[0-5]\d$/i) {
+function hasTimeFormat(regexp = TIMESTAMP_REGEXP) {
   return (value) => {
     return (typeof value === `string`) &&
       regexp.test(value);

@@ -5,6 +5,10 @@ class Offers {
     this._bucket = bucket;
   }
 
+  get files() {
+    return this._bucket;
+  }
+
   async get(skip = 0, limit = 0) {
     return await this._collection
         .find({}, {skip, limit})
@@ -27,10 +31,6 @@ class Offers {
   async count() {
     return await this._collection
         .count({});
-  }
-
-  get files() {
-    return this._bucket;
   }
 }
 

@@ -16,12 +16,15 @@ function setupOffers(db) {
 }
 
 module.exports = {
-  init(config) {
-    return MongoClient.connect(config.url)
-        .then((client) => client.db(config.dbName))
-        .then(setupOffers);
-  },
   get offers() {
     return offers;
+  },
+  async init({url, dbName}) {
+
+    const client = await MongoClient.connect(url);
+
+    const db = client.db(dbName);
+
+    setupOffers(db);
   },
 };
