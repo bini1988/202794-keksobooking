@@ -4,7 +4,7 @@ const Bucket = require(`./bucket`);
 
 let offers = null;
 
-function setupOffers(db) {
+const setupOffers = (db) => {
   const fsBucket = new GridFSBucket(db, {chunkSizeBytes: 1024, bucketName: `files`});
   const offersCollection = db.collection(`offers`);
 
@@ -13,7 +13,7 @@ function setupOffers(db) {
   offers = new Offers(offersCollection, new Bucket(fsBucket));
 
   return db;
-}
+};
 
 module.exports = {
   get offers() {

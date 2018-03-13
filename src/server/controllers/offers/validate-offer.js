@@ -205,11 +205,11 @@ const OFFER_FIELDS = [{
   ],
 }];
 
-function isValid(validations, value) {
+const isValid = (validations, value) => {
   return validations
       .map((validate) => validate(value))
       .every((item) => item === true);
-}
+};
 
 module.exports = {
   getValidatedOffer(obj) {

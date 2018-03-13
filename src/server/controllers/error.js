@@ -1,7 +1,7 @@
 const logger = require(`../services/logger`);
 const {ValidationError, NotFoundError} = require(`../services/errors`);
 
-function handleErrors(err, req, res, _next) {
+const handleErrors = (err, req, res, _next) => {
   logger.info(`Request error: ${err}`);
 
   if (err instanceof ValidationError) {
@@ -31,7 +31,7 @@ function handleErrors(err, req, res, _next) {
     error: `Internal Error`,
     errorMessage: `Server has fallen into unrecoverable problem.`
   }]);
-}
+};
 
 module.exports = {
   index: handleErrors,

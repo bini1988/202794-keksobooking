@@ -10,3 +10,6 @@ env:
   mocha: true
 
 extends: 'htmlacademy/node'
+
+rules:
+  func-style: ["error", "expression"]

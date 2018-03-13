@@ -11,17 +11,17 @@ cmds.push(
     require(`./fill`),
 );
 
-function printCommandUnknown(cmd) {
+const printCommandUnknown = (cmd) => {
   console.error(`Неизвестная команда "${cmd}".`);
   console.error(`Чтобы прочитать правила использования приложения, наберите "--help"`);
   process.exit(1);
-}
+};
 
-function isCmd(arg) {
+const isCmd = (arg) => {
   return arg.match(/^--[\w\d]+$/i);
-}
+};
 
-function parseCmds(arr) {
+const parseCmds = (arr) => {
   const cmdsArr = [];
   let cmd = {args: []};
 
@@ -35,9 +35,9 @@ function parseCmds(arr) {
   }
 
   return cmdsArr;
-}
+};
 
-function execute(args) {
+const execute = (args) => {
   const cmdsArr = parseCmds(args);
 
   for (const cmd of cmdsArr) {
@@ -51,7 +51,7 @@ function execute(args) {
       printCommandUnknown(cmd.type);
     }
   }
-}
+};
 
 module.exports = {
   execute,
