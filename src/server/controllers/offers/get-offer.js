@@ -4,7 +4,7 @@ const {isUnsignedInteger, asyncMiddleware} = require(`../../services/utils`);
 const DEFAULT_ITEMS_SKIP = 0;
 const DEFAULT_ITEMS_LIMIT = 20;
 
-function validateQuery(query) {
+const validateQuery = (query) => {
   const error = new ValidationError();
   const {skip, limit} = query;
 
@@ -19,7 +19,7 @@ function validateQuery(query) {
   if (error.hasErrors) {
     throw error;
   }
-}
+};
 
 module.exports = asyncMiddleware(async (req, res) => {
   const models = req.app.locals.models;

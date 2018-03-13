@@ -4,7 +4,7 @@ const Bucket = require(`./bucket`);
 
 let offers = null;
 
-function setupOffers(db) {
+const setupOffers = (db) => {
   const fsBucket = new GridFSBucket(db, {chunkSizeBytes: 1024, bucketName: `files`});
   const offersCollection = db.collection(`offers`);
 
@@ -13,15 +13,18 @@ function setupOffers(db) {
   offers = new Offers(offersCollection, new Bucket(fsBucket));
 
   return db;
-}
+};
 
 module.exports = {
-  init(config) {
-    return MongoClient.connect(config.url)
-        .then((client) => client.db(config.dbName))
-        .then(setupOffers);
-  },
   get offers() {
     return offers;
+  },
+  async init({url, dbName}) {
+
+    const client = await MongoClient.connect(url);
+
+    const db = client.db(dbName);
+
+    setupOffers(db);
   },
 };

@@ -1,20 +1,20 @@
 const {asyncMiddleware, toStream} = require(`../../services/utils`);
 const {getValidatedOffer} = require(`./validate-offer`);
 
-function setAttachedFile(form, files, type) {
+const setAttachedFile = (form, files, type) => {
   if (files && files[type] && files[type][0]) {
     form[type] = files[type][0];
   }
-}
+};
 
-async function saveAttachedFile(models, offerForm, fileType) {
+const saveAttachedFile = async (models, offerForm, fileType) => {
   const path = `/api/offers/${offerForm.date}/${fileType}`;
   const mimetype = offerForm[fileType].mimetype;
 
   await models.offers.files.put(path, toStream(offerForm[fileType].buffer));
 
   return {path, mimetype};
-}
+};
 
 module.exports = asyncMiddleware(async (req, res) => {
   const models = req.app.locals.models;

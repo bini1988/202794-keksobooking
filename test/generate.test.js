@@ -11,7 +11,7 @@ const {generateEntity} = require(`../src/generate/generate`);
 const locationFactory = require(`../src/generate/location`);
 const offerFactory = require(`../src/generate/offer`);
 
-function getEntities() {
+const getEntities = () => {
   const entities = [];
   const titlesCount = offerFactory.options.titles.length;
 
@@ -20,7 +20,7 @@ function getEntities() {
   }
 
   return entities;
-}
+};
 
 describe(`generateEntity`, () => {
   const entities = getEntities();

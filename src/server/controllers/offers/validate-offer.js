@@ -2,18 +2,33 @@ const {getRandomArrayElement} = require(`../../../utils/array`);
 const {hasType, hasLength, hasMaxLength, oneOf, inRange, hasTimeFormat, isSet, subsetOf, hasMimeType} = require(`../../../utils/validation`);
 const {ValidationError} = require(`../../services/errors`);
 
+const Title = {
+  MIN_LENGTH: 30,
+  MAX_LENGTH: 140,
+};
 
-const TITLE_MIN_LENGTH = 30;
-const TITLE_MAX_LENGTH = 140;
-const DESCRIPTION_MIN_LENGTH = 0;
-const DESCRIPTION_MAX_LENGTH = 140;
-const MIN_PRICE = 1;
-const MAX_PRICE = 100000;
+const Description = {
+  MIN_LENGTH: 0,
+  MAX_LENGTH: 140,
+};
+
+const Price = {
+  MIN: 1,
+  MAX: 100000,
+};
+
 const ADDRESS_MAX_LENGTH = 140;
-const MIN_ROOMS = 0;
-const MAX_ROOMS = 1000;
-const MIN_GUESTS = 0;
-const MAX_GUESTS = 1000;
+
+const Rooms = {
+  MIN: 0,
+  MAX: 1000,
+};
+
+const Guests = {
+  MIN: 0,
+  MAX: 1000,
+};
+
 const DEFAULT_NAMES = [`Keks`, `Pavel`, `Nikolay`, `Alex`, `Ulyana`, `Anastasyia`, `Julia`];
 
 
@@ -26,7 +41,7 @@ const OFFER_FIELDS = [{
   },
   validations: [
     hasType(`string`),
-    hasLength(TITLE_MIN_LENGTH, TITLE_MAX_LENGTH),
+    hasLength(Title.MIN_LENGTH, Title.MAX_LENGTH),
   ],
 }, {
   name: `description`,
@@ -37,7 +52,7 @@ const OFFER_FIELDS = [{
   },
   validations: [
     hasType(`string`),
-    hasLength(DESCRIPTION_MIN_LENGTH, DESCRIPTION_MAX_LENGTH),
+    hasLength(Description.MIN_LENGTH, Description.MAX_LENGTH),
   ],
 }, {
   name: `type`,
@@ -59,7 +74,7 @@ const OFFER_FIELDS = [{
   },
   validations: [
     hasType(`number`),
-    inRange(MIN_PRICE, MAX_PRICE),
+    inRange(Price.MIN, Price.MAX),
   ],
 }, {
   name: `address`,
@@ -103,7 +118,7 @@ const OFFER_FIELDS = [{
   },
   validations: [
     hasType(`number`),
-    inRange(MIN_ROOMS, MAX_ROOMS),
+    inRange(Rooms.MIN, Rooms.MAX),
   ],
 }, {
   name: `guests`,
@@ -114,7 +129,7 @@ const OFFER_FIELDS = [{
   },
   validations: [
     hasType(`number`),
-    inRange(MIN_GUESTS, MAX_GUESTS),
+    inRange(Guests.MIN, Guests.MAX),
   ],
 }, {
   name: `features`,
@@ -190,11 +205,11 @@ const OFFER_FIELDS = [{
   ],
 }];
 
-function isValid(validations, value) {
+const isValid = (validations, value) => {
   return validations
       .map((validate) => validate(value))
       .every((item) => item === true);
-}
+};
 
 module.exports = {
   getValidatedOffer(obj) {

@@ -14,7 +14,7 @@ const ASK_FILE_REWRITE = `ASK_FILE_REWRITE`;
 const SAVE_DATA = `SAVE_DATA`;
 const QUIT = `QUIT`;
 
-async function ask(message) {
+const ask = async (message) => {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -27,44 +27,44 @@ async function ask(message) {
   rl.close();
 
   return answer;
-}
+};
 
-function isYes(answer) {
+const isYes = (answer) => {
   return answer.match(/^д(а)?$/i);
-}
+};
 
-function isNo(answer) {
+const isNo = (answer) => {
   return answer.match(/^н(ет)?$/i);
-}
+};
 
-function isUInt(number) {
+const isUInt = (number) => {
   return Number.isInteger(number) && (number > 0);
-}
+};
 
-function merge(state, newState) {
+const merge = (state, newState) => {
   return Object.assign({}, state, newState);
-}
+};
 
 
-function confirmGenerate(answer) {
+const confirmGenerate = (answer) => {
   if (isYes(answer)) {
     return {action: ASK_NUMBER_OF_ELEMENTS};
   } else if (isNo(answer)) {
     return {action: QUIT};
   }
   return {action: ASK_TO_GENERATE};
-}
+};
 
-function readNumber(input) {
+const readNumber = (input) => {
   const count = parseInt(input, 10);
 
   if (isUInt(count)) {
     return {action: ASK_FILE_PATH, count};
   }
   return {action: ASK_NUMBER_OF_ELEMENTS};
-}
+};
 
-async function openFile(path) {
+const openFile = async (path) => {
   try {
     return {
       action: SAVE_DATA,
@@ -79,19 +79,19 @@ async function openFile(path) {
     console.log(err.message);
   }
   return {action: ASK_FILE_PATH};
-}
+};
 
 
-function confirmRewrite(answer) {
+const confirmRewrite = (answer) => {
   if (isYes(answer)) {
     return {action: SAVE_DATA};
   } else if (isNo(answer)) {
     return {action: ASK_FILE_PATH};
   }
   return {action: ASK_FILE_REWRITE};
-}
+};
 
-async function saveData({count, path, fd}) {
+const saveData = async ({count, path, fd}) => {
   try {
 
     fd = fd || await fopen(path, `w`);
@@ -108,9 +108,9 @@ async function saveData({count, path, fd}) {
     await fclose(fd);
     return {action: QUIT};
   }
-}
+};
 
-async function reduce(state) {
+const reduce = async (state) => {
   switch (state.action) {
     case ASK_TO_GENERATE:
       const answer = await ask(`Сгенерировать тестовые данные? (Да/Нет) :`);
@@ -129,23 +129,23 @@ async function reduce(state) {
     default:
       return state;
   }
-}
+};
 
-async function dialog() {
+const dialog = async () => {
   let state = {action: ASK_TO_GENERATE};
 
   while (state.action !== QUIT) {
     state = merge(state, await reduce(state));
   }
-}
+};
 
-async function show() {
+const show = async () => {
   try {
     await dialog();
   } catch (err) {
     console.log(err.message);
   }
-}
+};
 
 module.exports = {
   show,
