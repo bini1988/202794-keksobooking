@@ -14,6 +14,9 @@ const DB_DATABASE_NAME = process.env.DB_DATABASE_NAME || `keksobooking`;
 
 const app = express();
 
+app.set(`views`, `./src/server/views`);
+app.set(`view engine`, `ejs`);
+
 app.use(express.static(STATIC_FOLDER));
 app.use(bodyParser.json());
 app.use(CORSMiddleware);
