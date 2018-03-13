@@ -7,7 +7,8 @@ cmds.push(
     require(`./author`),
     require(`./description`),
     require(`./license`),
-    require(`./version`)
+    require(`./version`),
+    require(`./fill`),
 );
 
 function printCommandUnknown(cmd) {

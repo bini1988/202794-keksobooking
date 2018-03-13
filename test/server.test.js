@@ -192,8 +192,8 @@ describe(`Server`, function () {
         "type": `flat`,
         "price": 30000,
         "address": `102-0075 Tōkyō-to, Chiyoda-ku, Sanbanchō`,
-        "timein": `09:00`,
-        "timeout": `07:00`,
+        "checkin": `09:00`,
+        "checkout": `07:00`,
         "rooms": 1,
         "guests": 1,
         "features": [`elevator`, `conditioner`],
@@ -219,7 +219,7 @@ describe(`Server`, function () {
       const ERROR = `Validation Error`;
       const ERROR_MESSAGE = `is required`;
       const REQURED_FIELDS = [
-        `title`, `description`, `type`, `price`, `address`, `timein`, `timeout`, `rooms`];
+        `title`, `description`, `type`, `price`, `address`, `checkin`, `checkout`, `rooms`];
 
       function assertResponse(response) {
         assertArray(response, `object`);
@@ -248,7 +248,7 @@ describe(`Server`, function () {
       const ERROR = `Validation Error`;
       const ERROR_MESSAGE = `incorrect value`;
       const REQURED_FIELDS = [
-        `title`, `type`, `price`, `timein`, `timeout`, `rooms`, `guests`];
+        `title`, `type`, `price`, `checkin`, `checkout`, `rooms`, `guests`];
 
       function assertResponse(response) {
         assertArray(response, `object`);
@@ -270,8 +270,8 @@ describe(`Server`, function () {
             title: `Invalid value`,
             type: `Invalid value`,
             price: -100,
-            timein: `Invalid value`,
-            timeout: `Invalid value`,
+            checkin: `Invalid value`,
+            checkout: `Invalid value`,
             rooms: -100,
             guests: -100,
           })

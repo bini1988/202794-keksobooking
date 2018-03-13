@@ -1,8 +1,8 @@
+const logger = require(`../services/logger`);
 const {ValidationError, NotFoundError} = require(`../services/errors`);
 
-
 function handleErrors(err, req, res, _next) {
-  console.error(`[e] Error: ${err.message}`);
+  logger.info(`Request error: ${err}`);
 
   if (err instanceof ValidationError) {
     res.status(400).json(err.errors);
